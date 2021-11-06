@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Tasks(Enum):
+class TaskTypes(Enum):
     MAP = 1
     REDUCE = 2
 
