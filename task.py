@@ -8,9 +8,9 @@ class Task(object):
         self.task_type = task_type
 
     def __call__(self):
+        time.sleep(0.5)  # pretend to take some time to do the work
         if self.task_type == TaskTypes.MAP:
             MapReduce.map()
-            time.sleep(2)  # pretend to take some time to do the work
         elif self.task_type == TaskTypes.REDUCE:
             MapReduce.reduce()
         return "DONE"

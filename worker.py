@@ -8,6 +8,7 @@ class Worker(multiprocessing.Process):
         self.result_queue = result_queue
 
     def run(self):
+        print("Weszlo")
         proc_name = self.name
         while True:
             next_task = self.task_queue.get()
