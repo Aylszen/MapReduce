@@ -8,9 +8,12 @@ class MapReduce:
         # key: document name
         # value: document contents
         print("map")
+        for word in len(value.split()):
+            return word, 1
 
     @staticmethod
     def reduce(key, values):
         # key: a word
         # values: a list of counts
         print("reduce")
+        return key, sum(values)
