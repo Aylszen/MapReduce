@@ -10,7 +10,7 @@ R = 5  # Number of Reduce tasks/processes
 
 if __name__ == '__main__':
     data_reader = DataReader()
-    data_reader.open_file('input_files/lorem_ipsum_20_paragraphs.txt')
+    data_reader.open_file('input_files/lorem_ipsum_20_paragraphs.txt', "r")
     splitted_file = data_reader.split_file_by_lines()
     data_reader.close_file()
 
