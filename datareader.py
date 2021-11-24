@@ -31,3 +31,8 @@ class DataReader:
             data_list.append((line_split[0], int(line_split[1])))
         return data_list
 
+    def save_file(self, content):
+        self.file.write(content)
+
+
+
