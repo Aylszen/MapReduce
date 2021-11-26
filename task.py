@@ -4,9 +4,10 @@ from mapreduce import *
 
 
 class Task(object):
-    def __init__(self, task_type, path, state, worker):
+    def __init__(self, task_type, path_read, path_save, state, worker):
         self.task_type = task_type
-        self.path = path
+        self.path_read = path_read
+        self.path_save = path_save
         self.state = state
         self.worker = worker
 

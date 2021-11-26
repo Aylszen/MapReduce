@@ -17,9 +17,10 @@ class ResponseMessage:
 
 
 class TaskMessage:
-    def __init__(self, task, path):
+    def __init__(self, task, path_read, path_save):
         self.task = task
-        self.path = path
+        self.path_read = path_read
+        self.path_save = path_save
         self.message_type = enums.MessageType.ASSIGN_TASK
 
 

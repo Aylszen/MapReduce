@@ -44,8 +44,8 @@ class WorkerProcess(multiprocessing.Process):
             message = pickle.loads(data)
             if message.message_type == enums.MessageType.ASSIGN_TASK:
                 if message.task == enums.TaskTypes.MAP:
-                    print(self.name + "(" + str(self.host) + ":" + str(self.port) + ")", message.task, message.path)
-                    run(["MAP", message.path])
+                    print(self.name + "(" + str(self.host) + ":" + str(self.port) + ")", message.task, message.path_read)
+                    run(["MAP", message.path_read, message.path_save])
                     complete_task = CompleteTaskMessage(enums.TaskTypes.MAP)
                     data_string = pickle.dumps(complete_task)
                     self.sock.sendto(data_string, self.server)

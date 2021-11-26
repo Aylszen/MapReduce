@@ -50,7 +50,7 @@ class MasterProcess(multiprocessing.Process):
     def create_map_tasks(self):
         files = next(walk(self.path), (None, None, []))[2]  # [] if no file
         for file in files:
-            self.map_tasks.append(Task(enums.TaskTypes.MAP, self.path + file, enums.State.IDLE, enums.TaskTypes.NONE))
+            self.map_tasks.append(Task(enums.TaskTypes.MAP, self.path + file, self.path_map, enums.State.IDLE, enums.TaskTypes.NONE))
 
     def assign_tasks(self):
 
@@ -61,7 +61,7 @@ class MasterProcess(multiprocessing.Process):
                         if worker not in self.worker_machines_in_use:
                             map_task.worker = worker
                             self.worker_machines_in_use.append(worker)
-                            task_message = TaskMessage(enums.TaskTypes.MAP, map_task.path)
+                            task_message = TaskMessage(enums.TaskTypes.MAP, map_task.path_read, map_task.path_save)
                             data_string = pickle.dumps(task_message)
                             self.sock.sendto(data_string, (worker[0], worker[1]))
                             map_task.state = enums.State.IN_PROGRESS
