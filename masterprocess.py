@@ -42,6 +42,7 @@ class MasterProcess(multiprocessing.Process):
             if message.message_type == enums.MessageType.COMPLETE_TASK:
                 self.complete_task(address)
                 self.assign_tasks()
+                self.all_equal()
 
     def run(self):
         self.map_tasks = self.create_tasks(self.path, self.path_map, enums.TaskTypes.MAP)
@@ -72,5 +73,11 @@ class MasterProcess(multiprocessing.Process):
     def complete_task(self, worker):
         for map_task in self.map_tasks:
             if map_task.state == enums.State.IN_PROGRESS:
-                if worker == map_task.worker and worker in self.worker_machines_in_use:
-                    self.worker_machines_in_use.remove(worker)
+                if worker == map_task.worker:
+                    map_task.state = enums.State.COMPLETED
+                    if worker in self.worker_machines_in_use:
+                        self.worker_machines_in_use.remove(worker)
+
+    def all_equal(self):
+        if all(x.state == enums.State.COMPLETED for x in self.map_tasks):
+            print("ALL MAP TASKS COMPLETED!")
