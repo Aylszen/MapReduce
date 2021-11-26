@@ -44,13 +44,16 @@ class MasterProcess(multiprocessing.Process):
                 self.assign_tasks()
 
     def run(self):
+        self.map_tasks = self.create_tasks(self.path, self.path_map, enums.TaskTypes.MAP)
         threading.Thread(target=self.listen, args=()).start()
-        self.create_map_tasks()
 
-    def create_map_tasks(self):
-        files = next(walk(self.path), (None, None, []))[2]  # [] if no file
+    @staticmethod
+    def create_tasks(path_read, path_save, task_type):
+        tasks = []
+        files = next(walk(path_read), (None, None, []))[2]  # [] if no file
         for file in files:
-            self.map_tasks.append(Task(enums.TaskTypes.MAP, self.path + file, self.path_map, enums.State.IDLE, enums.TaskTypes.NONE))
+            tasks.append(Task(task_type, path_read + file, path_save, enums.State.IDLE, enums.TaskTypes.NONE))
+        return tasks
 
     def assign_tasks(self):
         for map_task in self.map_tasks:
