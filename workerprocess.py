@@ -20,7 +20,7 @@ class WorkerProcess(multiprocessing.Process):
         print(name, "was created, ip: ", self.host, "port: ", self.port)
 
     def connect(self):
-        message = Message(self.host, self.port)
+        message = Message(self.host, self.port, self.name)
         data_string = pickle.dumps(message)
 
         while True:

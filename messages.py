@@ -2,7 +2,8 @@ import enums
 
 
 class Message:
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, name):
+        self.name = name
         self.ip = ip
         self.port = port
         self.task_type = enums.TaskTypes.NONE
@@ -13,3 +14,10 @@ class Message:
 class ResponseMessage:
     def __init__(self, response):
         self.response = response
+
+
+class TaskMessage:
+    def __init__(self, task, path):
+        self.task = task
+        self.path = path
+

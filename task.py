@@ -4,8 +4,10 @@ from mapreduce import *
 
 
 class Task(object):
-    def __init__(self, task_type):
+    def __init__(self, task_type, path, state):
         self.task_type = task_type
+        self.path = path
+        self.state = state
 
     def __call__(self):
         time.sleep(0.5)  # pretend to take some time to do the work
