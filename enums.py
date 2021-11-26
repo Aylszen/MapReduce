@@ -21,3 +21,4 @@ class Response(Enum):
 class MessageType(Enum):
     SETUP = 1
     ASSIGN_TASK = 2
+    COMPLETE_TASK = 3

@@ -20,9 +20,11 @@ if __name__ == '__main__':
 
     host = '192.168.1.104'  # client/server ip
     port = 4000
-    path = 'splitted_files/'
+    path_split = 'splitted_files/'
+    path_map = 'map_files/'
+    path_reduce = 'reduce/'
 
-    master = MasterProcess(host, port, path)
+    master = MasterProcess(host, port, path_split, path_map, path_reduce, M)
     master.start()
     workers = []
     for i in range(M):

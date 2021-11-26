@@ -1,7 +1,9 @@
 import multiprocessing
 import socket
 import pickle
+import threading
 from messages import *
+from mapreduce import run
 
 
 class WorkerProcess(multiprocessing.Process):
@@ -31,10 +33,21 @@ class WorkerProcess(multiprocessing.Process):
                 if response.response.SUCCESSFUL:
                     self.is_connected = True
                     print("Good job: ", response.response)
+                    threading.Thread(target=self.listen, args=()).start()
 
     def run(self):
         self.connect()
 
-
+    def listen(self):
+        while True:
+            data, address = self.sock.recvfrom(1024)
+            message = pickle.loads(data)
+            if message.message_type == enums.MessageType.ASSIGN_TASK:
+                if message.task == enums.TaskTypes.MAP:
+                    print(self.name + "(" + str(self.host) + ":" + str(self.port) + ")", message.task, message.path)
+                    run(["MAP", message.path])
+                    complete_task = CompleteTaskMessage(enums.TaskTypes.MAP)
+                    data_string = pickle.dumps(complete_task)
+                    self.sock.sendto(data_string, self.server)
 
 

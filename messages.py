@@ -20,4 +20,11 @@ class TaskMessage:
     def __init__(self, task, path):
         self.task = task
         self.path = path
+        self.message_type = enums.MessageType.ASSIGN_TASK
+
+
+class CompleteTaskMessage:
+    def __init__(self, task):
+        self.task = task
+        self.message_type = enums.MessageType.COMPLETE_TASK
 
