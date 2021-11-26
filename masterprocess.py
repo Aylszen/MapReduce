@@ -26,6 +26,8 @@ class MasterProcess(multiprocessing.Process):
         self.path_map = path_map
         self.path_reduce = path_reduce
         self.map_tasks = []
+        self.reduce_tasks = []
+        self.map_task_finished = False
 
     def listen(self):
         while True:
@@ -42,7 +44,9 @@ class MasterProcess(multiprocessing.Process):
             if message.message_type == enums.MessageType.COMPLETE_TASK:
                 self.complete_task(address)
                 self.assign_tasks()
-                self.all_equal()
+                if not self.map_task_finished:
+                    if self.all_equal():
+                        self.reduce_tasks = self.create_tasks(self.path_map, self.path_reduce, enums.TaskTypes.REDUCE)
 
     def run(self):
         self.map_tasks = self.create_tasks(self.path, self.path_map, enums.TaskTypes.MAP)
@@ -80,4 +84,6 @@ class MasterProcess(multiprocessing.Process):
 
     def all_equal(self):
         if all(x.state == enums.State.COMPLETED for x in self.map_tasks):
+            self.map_task_finished = True
             print("ALL MAP TASKS COMPLETED!")
+            return True
