@@ -53,7 +53,6 @@ class MasterProcess(multiprocessing.Process):
             self.map_tasks.append(Task(enums.TaskTypes.MAP, self.path + file, self.path_map, enums.State.IDLE, enums.TaskTypes.NONE))
 
     def assign_tasks(self):
-
         for map_task in self.map_tasks:
             if map_task.state == enums.State.IDLE:
                 if map_task.worker == enums.TaskTypes.NONE:
@@ -70,5 +69,5 @@ class MasterProcess(multiprocessing.Process):
     def complete_task(self, worker):
         for map_task in self.map_tasks:
             if map_task.state == enums.State.IN_PROGRESS:
-                map_task.state = enums.State.COMPLETED
-                self.worker_machines_in_use.remove(map_task.worker)
+                if worker == map_task.worker and worker in self.worker_machines_in_use:
+                    self.worker_machines_in_use.remove(worker)

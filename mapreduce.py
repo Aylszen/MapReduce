@@ -46,7 +46,6 @@ def run(argv):
     path_save_map = "map_files/"
 
     if task.upper() == "MAP":
-        #time.sleep(4.5)  # pretend to take some time to do the work
         data_reader = DataReader()
         data_reader.open_file(path_read, "r")
         input_data = data_reader.file.read()
@@ -55,6 +54,7 @@ def run(argv):
         data_reader.open_file(path_save_map + path_read.split("/")[1], "w")
         data_reader.save_map_to_file(result)
         data_reader.close_file()
+
     elif task.upper() == "REDUCE":
         data_reader = DataReader()
         data_reader.open_file(path_read, "r")
