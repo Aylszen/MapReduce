@@ -45,15 +45,18 @@ class MasterProcess(multiprocessing.Process):
                 if self.num_of_workers == len(self.worker_machines):
                     self.assign_tasks()
             if message.message_type == enums.MessageType.COMPLETE_TASK:
-                self.complete_task(address)
+                self.complete_task(address, message.task)
                 self.assign_tasks()
-                if not self.map_task_finished:
-                    if self.all_equal():
-                        print("SHUFFLE STARTED!")
-                        helper.shuffle(self.path_map, self.path_shuffle)
-                        print("SHUFFLE FINISHED!")
-                        self.reduce_tasks = self.create_tasks(self.path_map, self.path_reduce, enums.TaskTypes.REDUCE)
-                        self.assign_tasks()
+                if message.task == enums.TaskTypes.MAP:
+                    if not self.map_task_finished:
+                        if self.all_tasks_finished(enums.TaskTypes.MAP):
+                            print("SHUFFLE STARTED!")
+                            helper.shuffle(self.path_map, self.path_shuffle)
+                            print("SHUFFLE FINISHED!")
+                            self.reduce_tasks = self.create_tasks(self.path_shuffle, self.path_reduce, enums.TaskTypes.REDUCE)
+                            self.assign_tasks()
+                if message.task == enums.TaskTypes.REDUCE:
+                    self.all_tasks_finished(enums.TaskTypes.REDUCE)
 
     def run(self):
         self.map_tasks = self.create_tasks(self.path, self.path_map, enums.TaskTypes.MAP)
@@ -95,16 +98,32 @@ class MasterProcess(multiprocessing.Process):
                                 reduce_task.state = enums.State.IN_PROGRESS
                                 break
 
-    def complete_task(self, worker):
-        for map_task in self.map_tasks:
-            if map_task.state == enums.State.IN_PROGRESS:
-                if worker == map_task.worker:
-                    map_task.state = enums.State.COMPLETED
-                    if worker in self.worker_machines_in_use:
-                        self.worker_machines_in_use.remove(worker)
+    def complete_task(self, worker, task_type):
+        if task_type == enums.TaskTypes.MAP:
+            for map_task in self.map_tasks:
+                if map_task.state == enums.State.IN_PROGRESS:
+                    if worker == map_task.worker:
+                        map_task.state = enums.State.COMPLETED
+                        if worker in self.worker_machines_in_use:
+                            self.worker_machines_in_use.remove(worker)
+        elif task_type == enums.TaskTypes.REDUCE:
+            for reduce_task in self.reduce_tasks:
+                if reduce_task.state == enums.State.IN_PROGRESS:
+                    if worker == reduce_task.worker:
+                        reduce_task.state = enums.State.COMPLETED
+                        if worker in self.worker_machines_in_use:
+                            self.worker_machines_in_use.remove(worker)
 
-    def all_equal(self):
-        if all(x.state == enums.State.COMPLETED for x in self.map_tasks):
-            self.map_task_finished = True
-            print("ALL MAP TASKS COMPLETED!")
-            return True
+    def all_tasks_finished(self, task_type):
+        if task_type == enums.TaskTypes.MAP:
+            if all(x.state == enums.State.COMPLETED for x in self.map_tasks):
+                self.map_task_finished = True
+                print("ALL MAP TASKS COMPLETED!")
+                return True
+        elif task_type == enums.TaskTypes.REDUCE:
+            if all(x.state == enums.State.COMPLETED for x in self.reduce_tasks):
+                self.map_task_finished = True
+                print("ALL REDUCE TASKS COMPLETED!")
+                return True
+        else:
+            return False

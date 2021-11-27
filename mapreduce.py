@@ -49,15 +49,10 @@ def run(argv):
         data_reader.open_file(path_read, "r")
         input_data = data_reader.file.read()
         result = MapReduce.map(input_data)
+        data_reader.close_file()
         data_reader = DataReader()
         data_reader.open_file(path_save_map + path_read.split("/")[1], "w")
         data_reader.save_map_to_file(result)
-        data_reader.close_file()
-
-    elif task.upper() == "SHUFFLE":
-        data_reader = DataReader()
-        data_reader.open_file(path_read, "r")
-        map_data = data_reader.read_map_from_file()
         data_reader.close_file()
 
     elif task.upper() == "REDUCE":
@@ -66,11 +61,16 @@ def run(argv):
         map_data = data_reader.read_map_from_file()
         data_reader.close_file()
         reduce_result = []
-        #for map_elem in map_data:
-        #    print(type(map_elem))
-        #    print(map_elem[0])
-        #    print(map_elem[1])
-        #    reduce_result.append(MapReduce.reduce(map_elem[0], map_elem[1]))
+        occurrences = []
+        for map_elem in map_data:
+            occurrences.append(map_elem[1])
+        reduce_result.append(MapReduce.reduce(map_elem[0], occurrences))
+        data_writer = DataReader()
+        data_writer.open_file(path_save + path_read.split('/')[1], "w")
+        for result in reduce_result:
+            str_to_save = result[0] + ' ' + str(result[1])
+            data_writer.save_file(str_to_save)
+        data_writer.close_file()
 
     elif task.upper() == "COMBINE":
         data_reader = DataReader()

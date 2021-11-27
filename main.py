@@ -1,6 +1,5 @@
 import os
 import multiprocessing
-from worker import Worker
 from task import Task
 from masterprocess import *
 from workerprocess import *
@@ -22,7 +21,7 @@ if __name__ == '__main__':
     port = 4000
     path_split = 'splitted_files/'
     path_map = 'map_files/'
-    path_reduce = 'reduce/'
+    path_reduce = 'reduce_files/'
     path_shuffle = 'shuffle/'
 
     master = MasterProcess(host, port, path_split, path_map, path_reduce, path_shuffle, M)
