@@ -2,6 +2,8 @@ import multiprocessing
 import socket
 import pickle
 import threading
+import helper
+from datareader import *
 from os import listdir
 from os.path import isfile, join
 from os import walk
@@ -11,7 +13,7 @@ from task import Task
 
 
 class MasterProcess(multiprocessing.Process):
-    def __init__(self, host, port, path, path_map, path_reduce, num_of_workers):
+    def __init__(self, host, port, path, path_map, path_reduce, path_shuffle, num_of_workers):
         super().__init__()
         self.worker_machines_in_use = []
         self.host = host
@@ -20,11 +22,12 @@ class MasterProcess(multiprocessing.Process):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
-        print("Server Started: ", self.host, ", port: ", self.port)
+        print("Master started: ", self.host, ", port: ", self.port)
         self.worker_machines = []
         self.path = path
         self.path_map = path_map
         self.path_reduce = path_reduce
+        self.path_shuffle = path_shuffle
         self.map_tasks = []
         self.reduce_tasks = []
         self.map_task_finished = False
@@ -46,6 +49,9 @@ class MasterProcess(multiprocessing.Process):
                 self.assign_tasks()
                 if not self.map_task_finished:
                     if self.all_equal():
+                        print("SHUFFLE STARTED!")
+                        helper.shuffle(self.path_map, self.path_shuffle)
+                        print("SHUFFLE FINISHED!")
                         self.reduce_tasks = self.create_tasks(self.path_map, self.path_reduce, enums.TaskTypes.REDUCE)
                         self.assign_tasks()
 
@@ -56,7 +62,7 @@ class MasterProcess(multiprocessing.Process):
     @staticmethod
     def create_tasks(path_read, path_save, task_type):
         tasks = []
-        files = next(walk(path_read), (None, None, []))[2]  # [] if no file
+        files = DataReader.read_all_file_names_from_location(path_read)
         for file in files:
             tasks.append(Task(task_type, path_read + file, path_save, enums.State.IDLE, enums.TaskTypes.NONE))
         return tasks

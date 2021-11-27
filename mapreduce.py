@@ -39,7 +39,6 @@ class MapReduce:
 
 
 def run(argv):
-    #input_data = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aliquam etiam erat velit scelerisque. Faucibus purus in massa tempor. Pellentesque habitant morbi tristique senectus et. Viverra orci sagittis eu volutpat odio facilisis mauris. Pharetra et ultrices neque ornare. Viverra suspendisse potenti nullam ac tortor vitae purus. Justo laoreet sit amet cursus sit. Tempus imperdiet nulla malesuada pellentesque elit eget gravida cum. Vulputate dignissim suspendisse in est ante in nibh. Volutpat lacus laoreet non curabitur. Amet cursus sit amet dictum sit. Morbi leo urna molestie at elementum eu facilisis sed. Rutrum tellus pellentesque eu tincidunt tortor aliquam. Id neque aliquam vestibulum morbi blandit."
     task = argv[0]
     path_read = argv[1]
     path_save = argv[2]
@@ -53,6 +52,12 @@ def run(argv):
         data_reader = DataReader()
         data_reader.open_file(path_save_map + path_read.split("/")[1], "w")
         data_reader.save_map_to_file(result)
+        data_reader.close_file()
+
+    elif task.upper() == "SHUFFLE":
+        data_reader = DataReader()
+        data_reader.open_file(path_read, "r")
+        map_data = data_reader.read_map_from_file()
         data_reader.close_file()
 
     elif task.upper() == "REDUCE":

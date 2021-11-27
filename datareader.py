@@ -1,3 +1,5 @@
+from os import walk
+
 class DataReader:
 
     def open_file(self, path, mode):
@@ -34,5 +36,8 @@ class DataReader:
     def save_file(self, content):
         self.file.write(content)
 
+    @staticmethod
+    def read_all_file_names_from_location(path_read):
+        return next(walk(path_read), (None, None, []))[2]  # [] if no file
 
 

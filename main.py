@@ -23,8 +23,9 @@ if __name__ == '__main__':
     path_split = 'splitted_files/'
     path_map = 'map_files/'
     path_reduce = 'reduce/'
+    path_shuffle = 'shuffle/'
 
-    master = MasterProcess(host, port, path_split, path_map, path_reduce, M)
+    master = MasterProcess(host, port, path_split, path_map, path_reduce, path_shuffle, M)
     master.start()
     workers = []
     for i in range(M):
