@@ -49,5 +49,9 @@ class WorkerProcess(multiprocessing.Process):
                     complete_task = CompleteTaskMessage(enums.TaskTypes.MAP)
                     data_string = pickle.dumps(complete_task)
                     self.sock.sendto(data_string, self.server)
-
-
+                if message.task == enums.TaskTypes.REDUCE:
+                    print(self.name + "(" + str(self.host) + ":" + str(self.port) + ")", message.task, message.path_read)
+                    run(["REDUCE", message.path_read, message.path_save])
+                    complete_task = CompleteTaskMessage(enums.TaskTypes.REDUCE)
+                    data_string = pickle.dumps(complete_task)
+                    self.sock.sendto(data_string, self.server)

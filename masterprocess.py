@@ -47,6 +47,7 @@ class MasterProcess(multiprocessing.Process):
                 if not self.map_task_finished:
                     if self.all_equal():
                         self.reduce_tasks = self.create_tasks(self.path_map, self.path_reduce, enums.TaskTypes.REDUCE)
+                        self.assign_tasks()
 
     def run(self):
         self.map_tasks = self.create_tasks(self.path, self.path_map, enums.TaskTypes.MAP)
@@ -61,18 +62,32 @@ class MasterProcess(multiprocessing.Process):
         return tasks
 
     def assign_tasks(self):
-        for map_task in self.map_tasks:
-            if map_task.state == enums.State.IDLE:
-                if map_task.worker == enums.TaskTypes.NONE:
-                    for worker in self.worker_machines:
-                        if worker not in self.worker_machines_in_use:
-                            map_task.worker = worker
-                            self.worker_machines_in_use.append(worker)
-                            task_message = TaskMessage(enums.TaskTypes.MAP, map_task.path_read, map_task.path_save)
-                            data_string = pickle.dumps(task_message)
-                            self.sock.sendto(data_string, (worker[0], worker[1]))
-                            map_task.state = enums.State.IN_PROGRESS
-                            break
+        if not self.map_task_finished:
+            for map_task in self.map_tasks:
+                if map_task.state == enums.State.IDLE:
+                    if map_task.worker == enums.TaskTypes.NONE:
+                        for worker in self.worker_machines:
+                            if worker not in self.worker_machines_in_use:
+                                map_task.worker = worker
+                                self.worker_machines_in_use.append(worker)
+                                task_message = TaskMessage(enums.TaskTypes.MAP, map_task.path_read, map_task.path_save)
+                                data_string = pickle.dumps(task_message)
+                                self.sock.sendto(data_string, (worker[0], worker[1]))
+                                map_task.state = enums.State.IN_PROGRESS
+                                break
+        else:
+            for reduce_task in self.reduce_tasks:
+                if reduce_task.state == enums.State.IDLE:
+                    if reduce_task.worker == enums.TaskTypes.NONE:
+                        for worker in self.worker_machines:
+                            if worker not in self.worker_machines_in_use:
+                                reduce_task.worker = worker
+                                self.worker_machines_in_use.append(worker)
+                                task_message = TaskMessage(enums.TaskTypes.REDUCE, reduce_task.path_read, reduce_task.path_save)
+                                data_string = pickle.dumps(task_message)
+                                self.sock.sendto(data_string, (worker[0], worker[1]))
+                                reduce_task.state = enums.State.IN_PROGRESS
+                                break
 
     def complete_task(self, worker):
         for map_task in self.map_tasks:

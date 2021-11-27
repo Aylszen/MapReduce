@@ -61,8 +61,12 @@ def run(argv):
         map_data = data_reader.read_map_from_file()
         data_reader.close_file()
         reduce_result = []
-        for map_elem in map_data:
-            reduce_result.append(MapReduce.reduce(map_elem))
+        #for map_elem in map_data:
+        #    print(type(map_elem))
+        #    print(map_elem[0])
+        #    print(map_elem[1])
+        #    reduce_result.append(MapReduce.reduce(map_elem[0], map_elem[1]))
+
     elif task.upper() == "COMBINE":
         data_reader = DataReader()
         data_reader.open_file(path_save, "r")
