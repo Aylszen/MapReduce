@@ -1,4 +1,7 @@
 from os import walk
+import os
+import glob
+
 
 class DataReader:
 
@@ -40,4 +43,22 @@ class DataReader:
     def read_all_file_names_from_location(path_read):
         return next(walk(path_read), (None, None, []))[2]  # [] if no file
 
+    @staticmethod
+    def remove_files_from_dir(directory):
+        files = glob.glob(directory + '*')
+        for f in files:
+            os.remove(f)
 
+    def remove_files_from_multiple_dirs(self, directories):
+        for directory in directories:
+            self.remove_files_from_dir(directory)
+
+    def combine_multiple_files(self, input_path, output_path):
+        read_files = glob.glob(input_path + '*.txt')
+        data_writer = DataReader()
+        data_writer.open_file(output_path + 'result.txt', 'a')
+        for f in read_files:
+            data_reader = DataReader()
+            data_reader.open_file(f, 'r')
+            #print(data_reader.file.read())
+            data_writer.save_file(data_reader.file.read() + '\n')

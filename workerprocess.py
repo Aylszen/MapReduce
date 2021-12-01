@@ -55,3 +55,4 @@ class WorkerProcess(multiprocessing.Process):
                     complete_task = CompleteTaskMessage(enums.TaskTypes.REDUCE)
                     data_string = pickle.dumps(complete_task)
                     self.sock.sendto(data_string, self.server)
+

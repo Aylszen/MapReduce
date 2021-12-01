@@ -56,7 +56,9 @@ class MasterProcess(multiprocessing.Process):
                             self.reduce_tasks = self.create_tasks(self.path_shuffle, self.path_reduce, enums.TaskTypes.REDUCE)
                             self.assign_tasks()
                 if message.task == enums.TaskTypes.REDUCE:
-                    self.all_tasks_finished(enums.TaskTypes.REDUCE)
+                    if self.all_tasks_finished(enums.TaskTypes.REDUCE):
+                        data_reader = DataReader()
+                        data_reader.combine_multiple_files(self.path_reduce, "result/")
 
     def run(self):
         self.map_tasks = self.create_tasks(self.path, self.path_map, enums.TaskTypes.MAP)
