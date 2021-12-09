@@ -155,3 +155,5 @@ reduce_files/
 splitted_files/
 test/
 shuffle/
+result/
+shuffle/
