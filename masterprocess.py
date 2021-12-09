@@ -31,9 +31,10 @@ class MasterProcess(multiprocessing.Process):
         self.map_tasks = []
         self.reduce_tasks = []
         self.map_task_finished = False
+        self.terminate = False
 
     def listen(self):
-        while True:
+        while not self.terminate:
             data, address = self.sock.recvfrom(1024)
             message = pickle.loads(data)
             if message.message_type == enums.MessageType.SETUP:
@@ -59,6 +60,12 @@ class MasterProcess(multiprocessing.Process):
                     if self.all_tasks_finished(enums.TaskTypes.REDUCE):
                         data_reader = DataReader()
                         data_reader.combine_multiple_files(self.path_reduce, "result/")
+                        close_worker_message = CloseWorkerProcessMessage()
+                        data_string = pickle.dumps(close_worker_message)
+                        for worker in self.worker_machines:
+                            self.sock.sendto(data_string, (worker[0], worker[1]))
+                        self.terminate = True
+                        print("Closing " + self.name + "(" + str(self.host) + ":" + str(self.port) + ")")
 
     def run(self):
         self.map_tasks = self.create_tasks(self.path, self.path_map, enums.TaskTypes.MAP)

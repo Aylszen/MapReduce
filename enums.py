@@ -22,3 +22,4 @@ class MessageType(Enum):
     SETUP = 1
     ASSIGN_TASK = 2
     COMPLETE_TASK = 3
+    CLOSE_WORKER_PROCESS = 4

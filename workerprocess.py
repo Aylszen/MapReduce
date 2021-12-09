@@ -2,6 +2,8 @@ import multiprocessing
 import socket
 import pickle
 import threading
+
+import enums
 from messages import *
 from mapreduce import run
 
@@ -19,13 +21,14 @@ class WorkerProcess(multiprocessing.Process):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
+        self.terminate = False
         print(name, "was created, ip: ", self.host, "port: ", self.port)
 
     def connect(self):
         message = Message(self.host, self.port, self.name)
         data_string = pickle.dumps(message)
 
-        while True:
+        while not self.terminate:
             if not self.is_connected:
                 self.sock.sendto(data_string, self.server)
                 data, address = self.sock.recvfrom(1024)
@@ -34,12 +37,14 @@ class WorkerProcess(multiprocessing.Process):
                     self.is_connected = True
                     print("Good job: ", response.response)
                     threading.Thread(target=self.listen, args=()).start()
+            if self.terminate:
+                break
 
     def run(self):
         self.connect()
 
     def listen(self):
-        while True:
+        while not self.terminate:
             data, address = self.sock.recvfrom(1024)
             message = pickle.loads(data)
             if message.message_type == enums.MessageType.ASSIGN_TASK:
@@ -55,4 +60,6 @@ class WorkerProcess(multiprocessing.Process):
                     complete_task = CompleteTaskMessage(enums.TaskTypes.REDUCE)
                     data_string = pickle.dumps(complete_task)
                     self.sock.sendto(data_string, self.server)
-
+            elif message.message_type == enums.MessageType.CLOSE_WORKER_PROCESS:
+                print("Closing " + self.name + "(" + str(self.host) + ":" + str(self.port) + ")", message.message_type)
+                self.terminate = True

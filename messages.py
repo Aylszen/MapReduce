@@ -29,3 +29,7 @@ class CompleteTaskMessage:
         self.task = task
         self.message_type = enums.MessageType.COMPLETE_TASK
 
+
+class CloseWorkerProcessMessage:
+    def __init__(self):
+        self.message_type = enums.MessageType.CLOSE_WORKER_PROCESS
